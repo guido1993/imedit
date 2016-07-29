@@ -1,0 +1,81 @@
+﻿<Page x:Name="pageRoot"
+      x:Class="Imedit.Views.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      DataContext="{Binding MainPage, Source={StaticResource ViewModelLocator}}"
+      d:DataContext="{d:DesignInstance Type=viewModels:MainPageViewModel, IsDesignTimeCreatable=True}"
+      xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+      xmlns:core="using:Microsoft.Xaml.Interactions.Core"
+      xmlns:helpers="using:Imedit.Helpers"
+      mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="0,20,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Pivot ItemsSource="{Binding PhotoGroups}">
+            <Pivot.HeaderTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Header}" />
+                </DataTemplate>
+            </Pivot.HeaderTemplate>
+
+            <Pivot.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <GridView ItemsSource="{Binding Photos}"
+                                  x:Name="PhotoList"
+                                  SelectionMode="None"
+                                  IsItemClickEnabled="True"
+                                  HorizontalAlignment="Stretch">
+                            <GridView.ItemTemplate>
+                                <DataTemplate>
+                                    <Image Stretch="Uniform" 
+                                           Source="{Binding Converter={StaticResource ImagePathToSourceConverter}}" />
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+
+                            <!--<GridView.ItemContainerStyle>
+                                <Style TargetType="GridViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                                </Style>
+                            </GridView.ItemContainerStyle>-->
+
+                            <GridView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <helpers:UniformGrid x:Name="GridPanelTemplate" Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </GridView.ItemsPanel>
+
+
+                            <interactivity:Interaction.Behaviors>
+                                <core:EventTriggerBehavior EventName="ItemClick">
+                                    <core:InvokeCommandAction Command="{Binding  ElementName=pageRoot, Path=DataContext.GoToEditPageCommand}" 
+                                                              InputConverter="{StaticResource ItemClickEventArgsConverter}" />
+                                </core:EventTriggerBehavior>
+                            </interactivity:Interaction.Behaviors>
+                        </GridView>
+
+                        <TextBlock Text="Non ci sono elementi in questa cartella"
+                                   Style="{StaticResource TitleTextBlockStyle}"
+                                   Margin="0,24,0,0"
+                                   Visibility="{Binding HasPhotos, Converter={StaticResource NegateBooleanToVisibilityConverter}}"/>
+                    </Grid>
+                </DataTemplate>
+            </Pivot.ItemTemplate>
+        </Pivot>
+
+        <!--<CommandBar Grid.Row="1"
+                    VerticalAlignment="Bottom">
+            <AppBarButton Icon="Camera"
+                          x:Uid="CameraButton"
+                          Command="{Binding TakePhotoCommand}" 
+                          Visibility="{Binding IsCameraPresent, Converter={StaticResource BooleanToVisibilityConverter}}" />           
+        </CommandBar>-->
+    </Grid>
+</Page>
